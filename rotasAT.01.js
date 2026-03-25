@@ -33,7 +33,7 @@ function buscarPorId(lista, id) {
 }
 
 function filtrarPorArtista(lista, nomeArtista) {
-    return lista.filter(m => m.artista.toLowerCase() === nomeArtista.toLowerCase());
+    return lista.filter(m => m.artista === nomeArtista);
 }
 
 function filtrarPorNotaMinima(lista, notaCorte) {
