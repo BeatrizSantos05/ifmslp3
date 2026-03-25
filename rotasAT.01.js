@@ -28,14 +28,6 @@ const produtos = [
     { id: 4, nome: "Monitor", preco: 1200 }
 ];
 
-// --- MÉTODOS AUXILIARES ---
-
-function calcularMedia(lista, propriedade) {
-    if (lista.length === 0) return 0;
-    const soma = lista.reduce((acc, item) => acc + item[propriedade], 0);
-    return soma / lista.length;
-}
-
 function buscarPorId(lista, id) {
     return lista.find(item => item.id === Number(id));
 }
@@ -54,8 +46,6 @@ function filtrarPorNotaMinima(lista, notaCorte) {
     return resultado;
 }
 
-// --- ROTAS FILMES ---
-
 app.get('/filmes', (req, res) => res.json(filmes));
 
 app.get('/filmes/:id', (req, res) => {
@@ -63,20 +53,24 @@ app.get('/filmes/:id', (req, res) => {
     if (filme) {
         res.json(filme);
     } else {
-        res.status(404).send("Filme não encontrado");
+        res.status(405).send("Filme não encontrado");
     }
 });
 
 app.get('/bem-avaliados', (req, res) => {
-    const lista = filtrarPorNotaMinima(filmes, 9);
-    res.json(lista);
+    res.json(filtrarPorNotaMinima(filmes, 9));
 });
 
-app.get('/media-filmes', (req, res) => {
-    res.json({ media: calcularMedia(filmes, 'nota') });
-});
+app.get('/filmes/ano/:ano', (req, res) => {
+    const ano = Number(req.params.ano);
+    const resultado = filmes.filter(f => f.ano === ano);
 
-// --- ROTAS MÚSICAS ---
+    if (resultado.length > 0) {
+        res.json(resultado);
+    } else {
+        res.status(404).send("Nenhum filme encontrado para esse ano");
+    }
+});
 
 app.get('/musicas', (req, res) => res.json(musicas));
 
@@ -99,15 +93,8 @@ app.get('/artista/:nome', (req, res) => {
 });
 
 app.get('/top', (req, res) => {
-    const lista = filtrarPorNotaMinima(musicas, 9);
-    res.json(lista);
+    res.json(filtrarPorNotaMinima(musicas, 9));
 });
-
-app.get('/media-musicas', (req, res) => {
-    res.json({ media: calcularMedia(musicas, 'nota') });
-});
-
-// --- ROTAS PRODUTOS ---
 
 app.get('/produtos', (req, res) => res.json(produtos));
 
@@ -128,26 +115,19 @@ app.get('/baratos', (req, res) => {
     res.json(produtos.filter(p => p.preco < 200));
 });
 
-app.get('/media-preco', (req, res) => {
-    res.json({ media_precos: calcularMedia(produtos, 'preco') });
-});
-
-// --- MENU E STATUS ---
-
 app.get("/", (req, res) => {
     res.send(`
         <h1>Menu</h1>
         <a href="/filmes">Ir para filmes</a><br>
-        <a href="/bem-avaliados">Ir para filmes nota >= 9</a><br>
-        <a href="/media-filmes">Média notas filmes</a><br>
+        <a href="/bem-avaliados">Filmes nota >= 9</a><br>
+        <a href="/filmes/ano/2010">Filmes por ano (ex: 2010)</a><br>
         <hr>
         <a href="/musicas">Ir para músicas</a><br>
-        <a href="/top">Ir para músicas nota >= 9</a><br>
-        <a href="/media-musicas">Média notas músicas</a><br>
+        <a href="/top">Músicas nota >= 9</a><br>
         <hr>
         <a href="/produtos">Ir para produtos</a><br>
         <a href="/caros">Produtos caros</a><br>
-        <a href="/media-preco">Média preços produtos</a><br>
+        <a href="/baratos">Produtos baratos</a><br>
         <hr>
         <a href="/status">Ir para status</a>
     `);
@@ -164,5 +144,5 @@ app.get("/status", (req, res) => {
 
 const PORTA = 3001;
 app.listen(PORTA, () => {
-    console.log(`servidor rodando em http://localhost:${PORTA}`);
+    console.log(`Servidor rodando em http://localhost:${PORTA}`);
 });
