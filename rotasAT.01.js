@@ -72,6 +72,15 @@ app.get('/filmes/ano/:ano', (req, res) => {
     }
 });
 
+app.post("/filme", (req, res) =>{
+    const novoFilme = req.body;
+    filmes.push(novoFilme);
+    res.json({
+        mensagem: "filme adicionado",
+        filme: novoFilme
+    });
+});
+
 app.get('/musicas', (req, res) => res.json(musicas));
 
 app.get('/musicas/:id', (req, res) => {
